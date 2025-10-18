@@ -34,24 +34,6 @@ public class Message {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
     
-    @Column(columnDefinition = "TEXT")
-    private String aiAnalysis;
-    
-    @Column
-    private String intent;
-    
-    @Column
-    private String sentiment;
-    
-    @Column
-    private Double confidence;
-    
-    @Column
-    private String suggestedActions;
-    
-    @Column
-    private Boolean isProcessed;
-    
     @CreatedDate
     private LocalDateTime timestamp;
 }

@@ -61,16 +61,6 @@ public class FinancialGoal {
     @Column(precision = 15, scale = 2)
     private BigDecimal monthlyContribution;
     
-    // AI рекомендации
-    @Column(columnDefinition = "TEXT")
-    private String aiRecommendations;
-    
-    @Column(columnDefinition = "TEXT")
-    private String suggestedProducts;
-    
-    @Column(columnDefinition = "TEXT")
-    private String motivationTips;
-    
     @CreatedDate
     private LocalDateTime createdAt;
     

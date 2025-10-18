@@ -1,4 +1,4 @@
-# Инструкция по запуску Zaman AI Assistant
+# Инструкция по запуску Zaman Bank Assistant
 
 ## Предварительные требования
 
@@ -28,9 +28,9 @@ docker-compose up -d
 
 Создайте базу данных PostgreSQL:
 ```sql
-CREATE DATABASE zaman_ai_assistant;
+CREATE DATABASE zaman_bank_assistant;
 CREATE USER zaman_user WITH PASSWORD 'zaman_password';
-GRANT ALL PRIVILEGES ON DATABASE zaman_ai_assistant TO zaman_user;
+GRANT ALL PRIVILEGES ON DATABASE zaman_bank_assistant TO zaman_user;
 ```
 
 ### 2. Настройка переменных окружения
@@ -41,9 +41,9 @@ GRANT ALL PRIVILEGES ON DATABASE zaman_ai_assistant TO zaman_user;
 DB_USERNAME=zaman_user
 DB_PASSWORD=zaman_password
 
-# AI API
-OPENAI_API_KEY=sk-roG3OusRr0TLCHAADks6lw
-OPENAI_BASE_URL=https://openai-hub.neuraldeep.tech
+# n8n Integration
+N8N_BASE_URL=http://localhost:5678
+N8N_API_KEY=your-n8n-api-key
 
 # JWT
 JWT_SECRET=your-secret-key-here
@@ -63,7 +63,7 @@ ADMIN_PASSWORD=admin123
 ./gradlew bootRun --args='--spring.profiles.active=dev'
 
 # Или запуск JAR файла
-java -jar build/libs/zaman-ai-assistant-0.0.1-SNAPSHOT.jar
+java -jar build/libs/zaman-bank-assistant-0.0.1-SNAPSHOT.jar
 ```
 
 ## API Документация

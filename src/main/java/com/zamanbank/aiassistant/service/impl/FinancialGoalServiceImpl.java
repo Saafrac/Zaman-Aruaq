@@ -54,9 +54,6 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
         existingGoal.setTargetDate(goal.getTargetDate());
         existingGoal.setMonthlyContribution(goal.getMonthlyContribution());
         existingGoal.setStatus(goal.getStatus());
-        existingGoal.setAiRecommendations(goal.getAiRecommendations());
-        existingGoal.setSuggestedProducts(goal.getSuggestedProducts());
-        existingGoal.setMotivationTips(goal.getMotivationTips());
         
         FinancialGoal updatedGoal = goalRepository.save(existingGoal);
         log.info("Обновлена финансовая цель: {}", updatedGoal.getId());

@@ -6,10 +6,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @EnableAsync
-public class ZamanAiAssistantApplication {
+public class ZamanBankAssistantApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ZamanAiAssistantApplication.class, args);
+        SpringApplication.run(ZamanBankAssistantApplication.class, args);
     }
 
 }

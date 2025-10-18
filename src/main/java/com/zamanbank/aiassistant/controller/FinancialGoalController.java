@@ -1,12 +1,10 @@
 package com.zamanbank.aiassistant.controller;
 
-import com.zamanbank.aiassistant.dto.GoalRecommendation;
 import com.zamanbank.aiassistant.model.FinancialGoal;
 import com.zamanbank.aiassistant.model.User;
 import com.zamanbank.aiassistant.model.enums.GoalStatus;
 import com.zamanbank.aiassistant.model.enums.GoalType;
 import com.zamanbank.aiassistant.model.enums.GoalPriority;
-import com.zamanbank.aiassistant.service.AiService;
 import com.zamanbank.aiassistant.service.FinancialGoalService;
 import com.zamanbank.aiassistant.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +24,6 @@ import java.util.List;
 public class FinancialGoalController {
     
     private final FinancialGoalService goalService;
-    private final AiService aiService;
     private final UserService userService;
     
     @PostMapping
@@ -50,16 +47,6 @@ public class FinancialGoalController {
                     .build();
             
             FinancialGoal savedGoal = goalService.createGoal(goal);
-            
-            // Генерируем AI рекомендации
-            List<GoalRecommendation> recommendations = aiService.generateGoalRecommendations(
-                    user, List.of(savedGoal));
-            
-            if (!recommendations.isEmpty()) {
-                savedGoal.setAiRecommendations(recommendations.get(0).getRecommendation());
-                goalService.updateGoal(savedGoal);
-            }
-            
             return ResponseEntity.ok(savedGoal);
             
         } catch (Exception e) {
@@ -135,36 +122,6 @@ public class FinancialGoalController {
         }
     }
     
-    @GetMapping("/{goalId}/recommendations")
-    public ResponseEntity<List<GoalRecommendation>> getGoalRecommendations(
-            @PathVariable Long goalId,
-            Authentication authentication) {
-        try {
-            User user = userService.getCurrentUser(authentication);
-            FinancialGoal goal = goalService.getGoalById(goalId, user);
-            List<GoalRecommendation> recommendations = aiService.generateGoalRecommendations(
-                    user, List.of(goal));
-            return ResponseEntity.ok(recommendations);
-        } catch (Exception e) {
-            log.error("Ошибка при получении рекомендаций", e);
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-    
-    @GetMapping("/{goalId}/motivation")
-    public ResponseEntity<String> getMotivationMessage(
-            @PathVariable Long goalId,
-            Authentication authentication) {
-        try {
-            User user = userService.getCurrentUser(authentication);
-            FinancialGoal goal = goalService.getGoalById(goalId, user);
-            String motivation = aiService.generateMotivationMessage(user, goal);
-            return ResponseEntity.ok(motivation);
-        } catch (Exception e) {
-            log.error("Ошибка при получении мотивационного сообщения", e);
-            return ResponseEntity.internalServerError().build();
-        }
-    }
     
     @DeleteMapping("/{goalId}")
     public ResponseEntity<Void> deleteGoal(
