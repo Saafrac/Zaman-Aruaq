@@ -1,10 +1,9 @@
 package com.zamanbank.aiassistant.model;
 
+import com.zamanbank.aiassistant.model.enums.UserRole;
+import com.zamanbank.aiassistant.model.enums.UserStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,10 +13,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter @Setter
 @EntityListeners(AuditingEntityListener.class)
 public class User {
     

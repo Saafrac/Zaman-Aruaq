@@ -1,21 +1,20 @@
 package com.zamanbank.aiassistant.controller;
 
-import com.zamanbank.aiassistant.dto.AiResponse;
 import com.zamanbank.aiassistant.model.Conversation;
 import com.zamanbank.aiassistant.model.Message;
 import com.zamanbank.aiassistant.model.User;
-import com.zamanbank.aiassistant.model.enums.MessageRole;
-import com.zamanbank.aiassistant.service.AiService;
 import com.zamanbank.aiassistant.service.ConversationService;
 import com.zamanbank.aiassistant.service.UserService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/chat")
@@ -23,12 +22,11 @@ import java.util.List;
 @Slf4j
 public class ChatController {
     
-    private final AiService aiService;
     private final ConversationService conversationService;
     private final UserService userService;
     
     @PostMapping("/message")
-    public ResponseEntity<AiResponse> sendMessage(
+    public ResponseEntity<SimpleResponse> sendMessage(
             @RequestBody ChatRequest request,
             Authentication authentication) {
         
@@ -36,46 +34,24 @@ public class ChatController {
             User user = userService.getCurrentUser(authentication);
             Conversation conversation = conversationService.getOrCreateActiveConversation(user);
             
-            // Сохраняем сообщение пользователя
-            Message userMessage = Message.builder()
-                    .conversation(conversation)
-                    .role(MessageRole.USER)
-                    .content(request.getMessage())
-                    .build();
-            conversationService.saveMessage(userMessage);
-            
-            // Обрабатываем сообщение через AI
-            AiResponse response = aiService.processMessage(
-                    request.getMessage(), 
-                    conversation, 
-                    user
-            );
-            
-            // Сохраняем ответ AI
-            Message aiMessage = Message.builder()
-                    .conversation(conversation)
-                    .role(MessageRole.ASSISTANT)
-                    .content(response.getContent())
-                    .intent(response.getIntent())
-                    .sentiment(response.getSentiment())
-                    .confidence(response.getConfidence())
-                    .suggestedActions(response.getSuggestedActions())
-                    .build();
-            conversationService.saveMessage(aiMessage);
+            // Простая заглушка - возвращаем эхо сообщения
+            SimpleResponse response = new SimpleResponse();
+            response.setContent("AI сервис временно недоступен. Ваше сообщение: " + request.getMessage());
+            response.setStatus("success");
             
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
             log.error("Ошибка при обработке сообщения", e);
-            return ResponseEntity.internalServerError()
-                    .body(AiResponse.builder()
-                            .content("Произошла ошибка. Попробуйте еще раз.")
-                            .build());
+            SimpleResponse errorResponse = new SimpleResponse();
+            errorResponse.setContent("Произошла ошибка. Попробуйте еще раз.");
+            errorResponse.setStatus("error");
+            return ResponseEntity.internalServerError().body(errorResponse);
         }
     }
     
     @PostMapping("/voice")
-    public ResponseEntity<AiResponse> sendVoiceMessage(
+    public ResponseEntity<SimpleResponse> sendVoiceMessage(
             @RequestParam("audio") MultipartFile audioFile,
             Authentication authentication) {
         
@@ -83,42 +59,19 @@ public class ChatController {
             User user = userService.getCurrentUser(authentication);
             Conversation conversation = conversationService.getOrCreateActiveConversation(user);
             
-            // Конвертируем голос в текст
-            String transcribedText = aiService.speechToText(audioFile.getBytes());
-            
-            if (transcribedText.isEmpty()) {
-                return ResponseEntity.badRequest()
-                        .body(AiResponse.builder()
-                                .content("Не удалось распознать речь. Попробуйте еще раз.")
-                                .build());
-            }
-            
-            // Обрабатываем как обычное текстовое сообщение
-            AiResponse response = aiService.processMessage(transcribedText, conversation, user);
-            
-            // Сохраняем сообщения
-            Message userMessage = Message.builder()
-                    .conversation(conversation)
-                    .role(MessageRole.USER)
-                    .content(transcribedText)
-                    .build();
-            conversationService.saveMessage(userMessage);
-            
-            Message aiMessage = Message.builder()
-                    .conversation(conversation)
-                    .role(MessageRole.ASSISTANT)
-                    .content(response.getContent())
-                    .build();
-            conversationService.saveMessage(aiMessage);
+            // Простая заглушка для голосовых сообщений
+            SimpleResponse response = new SimpleResponse();
+            response.setContent("Голосовые сообщения временно недоступны. AI сервис находится в разработке.");
+            response.setStatus("info");
             
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
             log.error("Ошибка при обработке голосового сообщения", e);
-            return ResponseEntity.internalServerError()
-                    .body(AiResponse.builder()
-                            .content("Произошла ошибка при обработке голоса.")
-                            .build());
+            SimpleResponse errorResponse = new SimpleResponse();
+            errorResponse.setContent("Произошла ошибка при обработке голоса.");
+            errorResponse.setStatus("error");
+            return ResponseEntity.internalServerError().body(errorResponse);
         }
     }
     
@@ -163,14 +116,16 @@ public class ChatController {
     }
     
     // DTO для запроса
+    @Getter @Setter
     public static class ChatRequest {
         private String message;
         private String sessionId;
-        
-        // Getters and setters
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-        public String getSessionId() { return sessionId; }
-        public void setSessionId(String sessionId) { this.sessionId = sessionId; }
+    }
+    
+    // Простой DTO для ответа
+    @Getter @Setter
+    public static class SimpleResponse {
+        private String content;
+        private String status;
     }
 }
