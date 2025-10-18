@@ -22,3 +22,4 @@ public class ProductRecommendation {
     private String benefits;
     private String requirements;
 }
+

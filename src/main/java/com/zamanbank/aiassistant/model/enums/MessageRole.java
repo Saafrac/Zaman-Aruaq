@@ -5,3 +5,4 @@ public enum MessageRole {
     ASSISTANT,          // AI-ассистент
     SYSTEM              // Система
 }
+

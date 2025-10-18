@@ -128,3 +128,4 @@ public class FinancialGoalServiceImpl implements FinancialGoalService {
         log.info("Удалена финансовая цель: {}", goalId);
     }
 }
+

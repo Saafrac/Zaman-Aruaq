@@ -55,3 +55,4 @@ public class Message {
     @CreatedDate
     private LocalDateTime timestamp;
 }
+

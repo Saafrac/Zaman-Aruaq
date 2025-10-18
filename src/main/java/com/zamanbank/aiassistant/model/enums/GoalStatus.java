@@ -7,3 +7,4 @@ public enum GoalStatus {
     PAUSED,             // Приостановлена
     CANCELLED           // Отменена
 }
+

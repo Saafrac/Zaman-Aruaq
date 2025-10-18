@@ -12,3 +12,4 @@ public enum TransactionType {
     INTEREST,           // Проценты
     FEE                 // Комиссия
 }
+

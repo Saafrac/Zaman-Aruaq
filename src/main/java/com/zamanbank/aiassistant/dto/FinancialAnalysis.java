@@ -22,3 +22,4 @@ public class FinancialAnalysis {
     private String spendingPattern;
     private BigDecimal monthlySurplus;
 }
+

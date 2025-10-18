@@ -12,3 +12,4 @@ public enum GoalType {
     BUSINESS,           // Бизнес
     OTHER               // Другое
 }
+

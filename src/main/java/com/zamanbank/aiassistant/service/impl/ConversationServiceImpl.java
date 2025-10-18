@@ -94,3 +94,4 @@ public class ConversationServiceImpl implements ConversationService {
         log.info("Разговор закрыт: {}", conversationId);
     }
 }
+

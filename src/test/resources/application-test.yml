@@ -31,3 +31,4 @@ logging:
   level:
     com.zamanbank.aiassistant: DEBUG
     org.springframework.security: DEBUG
+

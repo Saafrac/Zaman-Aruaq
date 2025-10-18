@@ -38,3 +38,4 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                                        @Param("startDate") LocalDateTime startDate, 
                                        @Param("endDate") LocalDateTime endDate);
 }
+

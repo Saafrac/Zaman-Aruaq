@@ -17,3 +17,4 @@ public class GoalRecommendation {
     private String actionPlan;
     private Double confidence;
 }
+

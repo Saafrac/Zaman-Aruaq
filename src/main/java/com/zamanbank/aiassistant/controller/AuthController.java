@@ -155,3 +155,4 @@ public class AuthController {
         public void setCurrentSavings(Double currentSavings) { this.currentSavings = currentSavings; }
     }
 }
+

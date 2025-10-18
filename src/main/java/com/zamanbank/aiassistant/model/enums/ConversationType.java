@@ -5,3 +5,4 @@ public enum ConversationType {
     VOICE,              // Голосовой чат
     MIXED               // Смешанный режим
 }
+
