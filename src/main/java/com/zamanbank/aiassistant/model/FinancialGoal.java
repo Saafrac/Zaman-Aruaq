@@ -77,7 +77,6 @@ public class FinancialGoal {
     @LastModifiedDate
     private LocalDateTime updatedAt;
     
-    // Прогресс в процентах
     public Double getProgressPercentage() {
         if (targetAmount.compareTo(BigDecimal.ZERO) == 0) {
             return 0.0;
@@ -87,7 +86,6 @@ public class FinancialGoal {
                 .doubleValue();
     }
     
-    // Осталось дней до цели
     public Long getDaysRemaining() {
         return java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), targetDate);
     }
