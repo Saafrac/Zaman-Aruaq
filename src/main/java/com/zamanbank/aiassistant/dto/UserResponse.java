@@ -2,6 +2,7 @@ package com.zamanbank.aiassistant.dto;
 
 import com.zamanbank.aiassistant.model.enums.UserRole;
 import com.zamanbank.aiassistant.model.enums.UserStatus;
+import java.util.UUID;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 public class UserResponse {
     
-    private Long id;
+    private UUID id;
     private String firstName;
     private String lastName;
     private String email;

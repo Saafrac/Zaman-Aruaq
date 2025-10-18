@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -42,6 +41,13 @@ public class Transaction {
     @Column(nullable = false)
     private LocalDate date;
 
-    @CreatedDate
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

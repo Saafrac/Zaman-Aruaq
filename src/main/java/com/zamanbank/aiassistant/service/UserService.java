@@ -7,33 +7,26 @@ import com.zamanbank.aiassistant.dto.UserUpdateRequest;
 import com.zamanbank.aiassistant.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UserService {
     
-    User getCurrentUser(Authentication authentication);
-    UserResponse getCurrentUserInfo(Authentication authentication);
-    UserProfileResponse getCurrentUserProfile(Authentication authentication);
-    
     UserResponse createUser(UserCreateRequest request);
-    UserResponse updateUser(Long id, UserUpdateRequest request);
-    UserResponse getUserById(Long id);
-    void deleteUser(Long id);
+    UserResponse updateUser(UUID id, UserUpdateRequest request);
+    UserResponse getUserById(UUID id);
+    void deleteUser(UUID id);
     
     List<UserResponse> getAllUsers();
     Page<UserResponse> getAllUsers(Pageable pageable);
     List<UserResponse> getUsersByRole(String role);
     List<UserResponse> getUsersByStatus(String status);
-
-    UserResponse updateCurrentUserProfile(Authentication authentication, UserUpdateRequest request);
     
-    void changePassword(Authentication authentication, String oldPassword, String newPassword);
-    
-    UserResponse updateFinancialInfo(Authentication authentication,
-      Double monthlyIncome,
-      Double monthlyExpenses,
-      Double currentSavings);
+    // Дополнительные методы
+    User getUserEntityById(UUID id);
+    List<UserResponse> searchUsers(String query);
+    UserResponse activateUser(UUID id);
+    UserResponse deactivateUser(UUID id);
 }
 

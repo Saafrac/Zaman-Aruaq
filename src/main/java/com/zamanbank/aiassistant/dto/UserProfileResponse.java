@@ -2,6 +2,7 @@ package com.zamanbank.aiassistant.dto;
 
 import com.zamanbank.aiassistant.model.enums.UserRole;
 import com.zamanbank.aiassistant.model.enums.UserStatus;
+import java.util.UUID;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 public class UserProfileResponse {
     
     // Основная информация
-    private Long id;
+    private UUID id;
     private String firstName;
     private String lastName;
     private String email;
@@ -26,10 +27,7 @@ public class UserProfileResponse {
     private Double netWorth;
     private Double monthlySavings;
     
-    // Предпочтения и настройки
-    private String financialGoals;
-    private String spendingHabits;
-    private String riskProfile;
+    // Предпочтения и настройки (будут добавлены позже)
     
     // Временные метки
     private LocalDateTime createdAt;

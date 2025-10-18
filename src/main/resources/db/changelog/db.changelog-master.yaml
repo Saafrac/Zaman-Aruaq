@@ -1,5 +1,5 @@
 databaseChangeLog:
   - include:
-      file: 001-create-tables.yaml
+      file: 003-final-migration.yaml
       relativeToChangelogFile: true
 

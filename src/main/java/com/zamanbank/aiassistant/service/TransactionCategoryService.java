@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-// src/main/java/com/zamanbank/aiassistant/service/TransactionCategoryService.java
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -28,9 +27,9 @@ public class TransactionCategoryService {
     if (description.toLowerCase().contains("аптека") ||
       description.toLowerCase().contains("здоровье") ||
       description.toLowerCase().contains("медицина")) {
-      return TransactionCategory.HEALTH;
+      return TransactionCategory.HEALTHCARE;
     }
 
-    return TransactionCategory.OTHER;
+    return TransactionCategory.OTHER_EXPENSE;
   }
 }

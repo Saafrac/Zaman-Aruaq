@@ -3,6 +3,7 @@ package com.zamanbank.aiassistant.model;
 import com.zamanbank.aiassistant.model.enums.UserRole;
 import com.zamanbank.aiassistant.model.enums.UserStatus;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -22,10 +23,10 @@ import java.util.List;
 public class User {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
     
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = true)
     private String phoneNumber;
     
     @Column(nullable = false)
@@ -41,9 +42,11 @@ public class User {
     private String password;
     
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private UserRole role = UserRole.CLIENT;
     
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
     
     // Финансовые данные
@@ -56,16 +59,6 @@ public class User {
     @Column
     private Double currentSavings;
     
-    // Предпочтения для AI
-    @Column(columnDefinition = "TEXT")
-    private String financialGoals;
-    
-    @Column(columnDefinition = "TEXT")
-    private String spendingHabits;
-    
-    @Column(columnDefinition = "TEXT")
-    private String riskProfile;
-    
     @CreatedDate
     private LocalDateTime createdAt;
     
@@ -74,7 +67,7 @@ public class User {
     
     // Связи
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<FinancialGoal> goals;
+    private List<FinancialGoal> financialGoals;
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Transaction> transactions;

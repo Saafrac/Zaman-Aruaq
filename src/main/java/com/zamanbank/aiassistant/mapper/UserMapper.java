@@ -19,11 +19,9 @@ public class UserMapper {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
-        user.setRole(request.getRole());
-        user.setStatus(request.getStatus());
-        user.setMonthlyIncome(request.getMonthlyIncome());
-        user.setMonthlyExpenses(request.getMonthlyExpenses());
-        user.setCurrentSavings(request.getCurrentSavings());
+        // Устанавливаем значения по умолчанию
+        user.setRole(com.zamanbank.aiassistant.model.enums.UserRole.CLIENT);
+        user.setStatus(com.zamanbank.aiassistant.model.enums.UserStatus.ACTIVE);
         
         return user;
     }
@@ -119,9 +117,6 @@ public class UserMapper {
         response.setMonthlyIncome(user.getMonthlyIncome());
         response.setMonthlyExpenses(user.getMonthlyExpenses());
         response.setCurrentSavings(user.getCurrentSavings());
-        response.setFinancialGoals(user.getFinancialGoals());
-        response.setSpendingHabits(user.getSpendingHabits());
-        response.setRiskProfile(user.getRiskProfile());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
         

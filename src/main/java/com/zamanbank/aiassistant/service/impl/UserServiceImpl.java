@@ -14,13 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,42 +30,7 @@ public class UserServiceImpl implements UserService {
     
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
     
-    @Override
-    public User getCurrentUser(Authentication authentication) {
-        String email = authentication.getName();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден: " + email));
-    }
-    
-    @Override
-    public UserResponse getCurrentUserInfo(Authentication authentication) {
-        User user = getCurrentUser(authentication);
-        return userMapper.toSafeResponse(user);
-    }
-    
-    @Override
-    public UserProfileResponse getCurrentUserProfile(Authentication authentication) {
-        User user = getCurrentUser(authentication);
-        UserProfileResponse profile = userMapper.toProfileResponse(user);
-        
-        // Получаем статистику пользователя
-        try {
-            // Здесь можно добавить реальную статистику из базы данных
-            // Пока что используем заглушки, но в будущем можно добавить:
-            // - profile.setTotalGoals(goalRepository.countByUser(user));
-            // - profile.setActiveGoals(goalRepository.countByUserAndStatus(user, GoalStatus.ACTIVE));
-            // - profile.setTotalTransactions(transactionRepository.countByUser(user));
-            // - profile.setTotalConversations(conversationRepository.countByUser(user));
-            
-            log.info("Получен полный профиль пользователя: {} с ID: {}", user.getEmail(), user.getId());
-        } catch (Exception e) {
-            log.warn("Не удалось получить статистику для пользователя {}: {}", user.getEmail(), e.getMessage());
-        }
-        
-        return profile;
-    }
     
     @Override
     public UserResponse createUser(UserCreateRequest request) {
@@ -76,7 +40,7 @@ public class UserServiceImpl implements UserService {
         }
         
         User user = userMapper.toEntity(request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(request.getPassword()); // Простое сохранение пароля без шифрования
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
         
@@ -86,7 +50,7 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    public UserResponse updateUser(Long id, UserUpdateRequest request) {
+    public UserResponse updateUser(UUID id, UserUpdateRequest request) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         
@@ -101,7 +65,7 @@ public class UserServiceImpl implements UserService {
         
         // Обрабатываем пароль отдельно
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+            existingUser.setPassword(request.getPassword()); // Простое сохранение пароля без шифрования
         }
         
         existingUser.setUpdatedAt(LocalDateTime.now());
@@ -112,14 +76,14 @@ public class UserServiceImpl implements UserService {
     
     @Override
     @Transactional(readOnly = true)
-    public UserResponse getUserById(Long id) {
+    public UserResponse getUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         return userMapper.toSafeResponse(user);
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         userRepository.delete(user);
@@ -159,40 +123,39 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
     
+    
     @Override
-    public UserResponse updateCurrentUserProfile(Authentication authentication, UserUpdateRequest request) {
-        User currentUser = getCurrentUser(authentication);
-        return updateUser(currentUser.getId(), request);
+    public User getUserEntityById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
     }
     
     @Override
-    public void changePassword(Authentication authentication, String oldPassword, String newPassword) {
-        User currentUser = getCurrentUser(authentication);
-        
-        if (!passwordEncoder.matches(oldPassword, currentUser.getPassword())) {
-            throw new RuntimeException("Неверный текущий пароль");
-        }
-        
-        currentUser.setPassword(passwordEncoder.encode(newPassword));
-        currentUser.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(currentUser);
-        log.info("Пароль изменен для пользователя: {}", currentUser.getEmail());
+    public List<UserResponse> searchUsers(String query) {
+        List<User> users = userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                query, query, query);
+        return users.stream()
+                .map(userMapper::toSafeResponse)
+                .collect(Collectors.toList());
     }
     
     @Override
-    public UserResponse updateFinancialInfo(Authentication authentication,
-      Double monthlyIncome,
-      Double monthlyExpenses,
-      Double currentSavings
-      ) {
-        User currentUser = getCurrentUser(authentication);
-        currentUser.setMonthlyIncome(monthlyIncome);
-        currentUser.setMonthlyExpenses(monthlyExpenses);
-        currentUser.setCurrentSavings(currentSavings);
-        currentUser.setUpdatedAt(LocalDateTime.now());
-        
-        User updatedUser = userRepository.save(currentUser);
-        log.info("Финансовая информация обновлена для пользователя: {}", updatedUser.getEmail());
+    public UserResponse activateUser(UUID id) {
+        User user = getUserEntityById(id);
+        user.setStatus(UserStatus.ACTIVE);
+        user.setUpdatedAt(LocalDateTime.now());
+        User updatedUser = userRepository.save(user);
+        log.info("Пользователь {} активирован", updatedUser.getEmail());
+        return userMapper.toSafeResponse(updatedUser);
+    }
+    
+    @Override
+    public UserResponse deactivateUser(UUID id) {
+        User user = getUserEntityById(id);
+        user.setStatus(UserStatus.INACTIVE);
+        user.setUpdatedAt(LocalDateTime.now());
+        User updatedUser = userRepository.save(user);
+        log.info("Пользователь {} деактивирован", updatedUser.getEmail());
         return userMapper.toSafeResponse(updatedUser);
     }
 }

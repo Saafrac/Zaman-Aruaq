@@ -1,11 +1,7 @@
 package com.zamanbank.aiassistant.dto;
 
-import com.zamanbank.aiassistant.model.enums.UserRole;
-import com.zamanbank.aiassistant.model.enums.UserStatus;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 @Data
 public class UserCreateRequest {
@@ -26,11 +22,4 @@ public class UserCreateRequest {
     @NotBlank(message = "Пароль обязателен")
     @Size(min = 6, max = 100, message = "Пароль должен содержать от 6 до 100 символов")
     private String password;
-    
-    private UserRole role = UserRole.CLIENT;
-    private UserStatus status = UserStatus.ACTIVE;
-    
-    private Double monthlyIncome;
-    private Double monthlyExpenses;
-    private Double currentSavings;
 }
