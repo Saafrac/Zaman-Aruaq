@@ -10,6 +10,7 @@ public enum TransactionType {
     INVESTMENT,         // Инвестиция
     LOAN_PAYMENT,       // Платеж по кредиту
     INTEREST,           // Проценты
-    FEE                 // Комиссия
+    FEE,                 // Комиссия
+    PURCHASE
 }
 

@@ -1,0 +1,404 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-clean-database
+      author: zaman-bank
+      runOnChange: true
+      changes:
+        - sql:
+            sql: |
+              -- Удаляем все таблицы в правильном порядке (сначала зависимые, потом основные)
+              DROP TABLE IF EXISTS messages CASCADE;
+              DROP TABLE IF EXISTS conversations CASCADE;
+              DROP TABLE IF EXISTS financial_goals CASCADE;
+              DROP TABLE IF EXISTS transactions CASCADE;
+              DROP TABLE IF EXISTS users CASCADE;
+              
+              -- Удаляем все индексы
+              DROP INDEX IF EXISTS idx_users_email;
+              DROP INDEX IF EXISTS idx_conversations_user_id;
+              DROP INDEX IF EXISTS idx_messages_conversation_id;
+              DROP INDEX IF EXISTS idx_goals_user_id;
+              DROP INDEX IF EXISTS idx_transactions_user_id;
+              DROP INDEX IF EXISTS idx_transactions_date;
+
+  - changeSet:
+      id: 002-create-users-table
+      author: zaman-bank
+      runOnChange: true
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    defaultValueComputed: 'gen_random_uuid()'
+              - column:
+                  name: first_name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: phone_number
+                  type: varchar(20)
+                  constraints:
+                    nullable: true
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: monthly_income
+                  type: decimal(15,2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: monthly_expenses
+                  type: decimal(15,2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: current_savings
+                  type: decimal(15,2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: role
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+                    defaultValue: 'CLIENT'
+              - column:
+                  name: status
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+                    defaultValue: 'ACTIVE'
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                    defaultValueComputed: 'CURRENT_TIMESTAMP'
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                    defaultValueComputed: 'CURRENT_TIMESTAMP'
+
+  - changeSet:
+      id: 003-create-conversations-table
+      author: zaman-bank
+      runOnChange: true
+      changes:
+        - createTable:
+            tableName: conversations
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    defaultValueComputed: 'gen_random_uuid()'
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_conversations_user
+                    references: users(id)
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: type
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+                    defaultValue: 'ACTIVE'
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                    defaultValueComputed: 'CURRENT_TIMESTAMP'
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                    defaultValueComputed: 'CURRENT_TIMESTAMP'
+
+  - changeSet:
+      id: 004-create-messages-table
+      author: zaman-bank
+      runOnChange: true
+      changes:
+        - createTable:
+            tableName: messages
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: conversation_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_messages_conversation
+                    references: conversations(id)
+              - column:
+                  name: content
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: intent
+                  type: varchar(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: sentiment
+                  type: varchar(20)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: confidence
+                  type: decimal(3,2)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                    defaultValueComputed: 'CURRENT_TIMESTAMP'
+
+  - changeSet:
+      id: 005-create-financial-goals-table
+      author: zaman-bank
+      runOnChange: true
+      changes:
+        - createTable:
+            tableName: financial_goals
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_goals_user
+                    references: users(id)
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: true
+              - column:
+                  name: type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: priority
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+                    defaultValue: 'PLANNING'
+              - column:
+                  name: target_amount
+                  type: decimal(15,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: current_amount
+                  type: decimal(15,2)
+                  constraints:
+                    nullable: false
+                    defaultValue: '0.00'
+              - column:
+                  name: target_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                    defaultValueComputed: 'CURRENT_TIMESTAMP'
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                    defaultValueComputed: 'CURRENT_TIMESTAMP'
+
+  - changeSet:
+      id: 006-create-transactions-table
+      author: zaman-bank
+      runOnChange: true
+      changes:
+        - createTable:
+            tableName: transactions
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_transactions_user
+                    references: users(id)
+              - column:
+                  name: amount
+                  type: decimal(15,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: true
+              - column:
+                  name: date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+                    defaultValueComputed: 'CURRENT_TIMESTAMP'
+
+  - changeSet:
+      id: 007-create-indexes
+      author: zaman-bank
+      runOnChange: true
+      changes:
+        - createIndex:
+            tableName: users
+            indexName: idx_users_email
+            columns:
+              - column:
+                  name: email
+        - createIndex:
+            tableName: conversations
+            indexName: idx_conversations_user_id
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            tableName: messages
+            indexName: idx_messages_conversation_id
+            columns:
+              - column:
+                  name: conversation_id
+        - createIndex:
+            tableName: financial_goals
+            indexName: idx_goals_user_id
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            tableName: transactions
+            indexName: idx_transactions_user_id
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            tableName: transactions
+            indexName: idx_transactions_date
+            columns:
+              - column:
+                  name: date
+
+  - changeSet:
+      id: 008-insert-sample-data
+      author: zaman-bank
+      runOnChange: true
+      changes:
+        - sql:
+            sql: |
+              -- Вставляем тестового пользователя
+              INSERT INTO users (id, first_name, last_name, email, phone_number, password, monthly_income, monthly_expenses, current_savings, role, status, created_at, updated_at)
+              VALUES (
+                gen_random_uuid(),
+                'Тест',
+                'Пользователь',
+                'test@example.com',
+                '+7 777 123 45 67',
+                'password123',
+                500000.00,
+                300000.00,
+                100000.00,
+                'CLIENT',
+                'ACTIVE',
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              );

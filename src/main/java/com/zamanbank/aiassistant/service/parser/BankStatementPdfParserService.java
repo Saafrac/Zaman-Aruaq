@@ -2,6 +2,7 @@ package com.zamanbank.aiassistant.service.parser;
 
 import com.zamanbank.aiassistant.dto.bank.BankStatement;
 import com.zamanbank.aiassistant.dto.bank.BankTransaction;
+import com.zamanbank.aiassistant.model.enums.TransactionCategory;
 import com.zamanbank.aiassistant.model.enums.TransactionType;
 import java.io.File;
 import java.io.IOException;
@@ -345,6 +346,7 @@ public class BankStatementPdfParserService {
       TransactionType type = amount.compareTo(BigDecimal.ZERO) > 0
         ? TransactionType.INCOME
         : TransactionType.EXPENSE;
+      TransactionCategory category = determineTransactionCategory(description);
 
       BankTransaction transaction = BankTransaction.builder()
         .operationDate(operationDate)
@@ -353,9 +355,11 @@ public class BankStatementPdfParserService {
         .amount(amount.abs())
         .currency("KZT")
         .type(type)
+        .category(category)
         .build();
 
-      log.info("Гибко распарсена транзакция: {}", transaction);
+      log.info("Гибко распарсена транзакция: {} (тип: {}, категория: {})",
+        transaction, type, category);
       return transaction;
 
     } catch (Exception e) {
@@ -423,5 +427,92 @@ public class BankStatementPdfParserService {
       log.warn("Ошибка при парсинге даты: {}", dateStr);
       return LocalDate.now();
     }
+  }
+
+  private TransactionType determineTransactionType(String description) {
+    if (description == null) return TransactionType.EXPENSE;
+
+    String desc = description.toLowerCase();
+
+    // Ключевые слова для доходов
+    if (desc.contains("пополнение") ||
+      desc.contains("перевод") && (desc.contains("от") || desc.contains("из")) ||
+      desc.contains("зарплата") ||
+      desc.contains("доход") ||
+      desc.contains("возврат") ||
+      desc.contains("комиссия") && desc.contains("возврат")) {
+      return TransactionType.INCOME;
+    }
+
+    return TransactionType.EXPENSE;
+  }
+
+  private TransactionCategory determineTransactionCategory(String description) {
+    if (description == null) return TransactionCategory.OTHER_EXPENSE;
+
+    String desc = description.toLowerCase();
+
+    // Еда и напитки
+    if (desc.contains("кофейня") ||
+      desc.contains("кафе") ||
+      desc.contains("ресторан") ||
+      desc.contains("магазин") ||
+      desc.contains("супермаркет") ||
+      desc.contains("еда") ||
+      desc.contains("продукты") ||
+      desc.contains("пицца") ||
+      desc.contains("бургер")) {
+      return TransactionCategory.FOOD;
+    }
+
+    // Транспорт
+    if (desc.contains("транспорт") ||
+      desc.contains("автобус") ||
+      desc.contains("такси") ||
+      desc.contains("метро") ||
+      desc.contains("бензин") ||
+      desc.contains("заправка") ||
+      desc.contains("парковка")) {
+      return TransactionCategory.TRANSPORT;
+    }
+
+    // Здоровье
+    if (desc.contains("аптека") ||
+      desc.contains("здоровье") ||
+      desc.contains("медицина") ||
+      desc.contains("врач") ||
+      desc.contains("больница") ||
+      desc.contains("клиника")) {
+      return TransactionCategory.HEALTHCARE;
+    }
+
+    // Образование
+    if (desc.contains("университет") ||
+      desc.contains("школа") ||
+      desc.contains("образование") ||
+      desc.contains("курсы") ||
+      desc.contains("обучение")) {
+      return TransactionCategory.EDUCATION;
+    }
+
+    // Развлечения
+    if (desc.contains("кино") ||
+      desc.contains("театр") ||
+      desc.contains("концерт") ||
+      desc.contains("игра") ||
+      desc.contains("развлечение")) {
+      return TransactionCategory.ENTERTAINMENT;
+    }
+
+    // Покупки
+    if (desc.contains("покупка") ||
+      desc.contains("магазин") ||
+      desc.contains("одежда") ||
+      desc.contains("обувь") ||
+      desc.contains("электроника")) {
+      return TransactionCategory.SHOPPING;
+    }
+
+    return TransactionCategory.OTHER_EXPENSE;
   }
 }
