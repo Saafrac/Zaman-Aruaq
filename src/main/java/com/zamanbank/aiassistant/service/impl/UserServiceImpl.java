@@ -19,7 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -118,22 +117,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         return userMapper.toSafeResponse(user);
     }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public User getUserEntityById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public UserResponse getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        return userMapper.toSafeResponse(user);
-    }
-    
+
     @Override
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
@@ -176,15 +160,6 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    @Transactional(readOnly = true)
-    public List<UserResponse> searchUsers(String query) {
-        return userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
-                query, query, query).stream()
-                .map(userMapper::toSafeResponse)
-                .collect(Collectors.toList());
-    }
-    
-    @Override
     public UserResponse updateCurrentUserProfile(Authentication authentication, UserUpdateRequest request) {
         User currentUser = getCurrentUser(authentication);
         return updateUser(currentUser.getId(), request);
@@ -202,28 +177,6 @@ public class UserServiceImpl implements UserService {
         currentUser.setUpdatedAt(LocalDateTime.now());
         userRepository.save(currentUser);
         log.info("Пароль изменен для пользователя: {}", currentUser.getEmail());
-    }
-    
-    @Override
-    public UserResponse activateUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        user.setStatus(UserStatus.ACTIVE);
-        user.setUpdatedAt(LocalDateTime.now());
-        User updatedUser = userRepository.save(user);
-        log.info("Пользователь активирован: {}", updatedUser.getEmail());
-        return userMapper.toSafeResponse(updatedUser);
-    }
-    
-    @Override
-    public UserResponse deactivateUser(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        user.setStatus(UserStatus.INACTIVE);
-        user.setUpdatedAt(LocalDateTime.now());
-        User updatedUser = userRepository.save(user);
-        log.info("Пользователь деактивирован: {}", updatedUser.getEmail());
-        return userMapper.toSafeResponse(updatedUser);
     }
     
     @Override

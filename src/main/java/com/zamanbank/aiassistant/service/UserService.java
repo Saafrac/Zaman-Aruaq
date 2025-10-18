@@ -13,41 +13,24 @@ import java.util.List;
 
 public interface UserService {
     
-    // Получение текущего пользователя
     User getCurrentUser(Authentication authentication);
     UserResponse getCurrentUserInfo(Authentication authentication);
     UserProfileResponse getCurrentUserProfile(Authentication authentication);
     
-    // CRUD операции
     UserResponse createUser(UserCreateRequest request);
     UserResponse updateUser(Long id, UserUpdateRequest request);
     UserResponse getUserById(Long id);
-    UserResponse getUserByEmail(String email);
     void deleteUser(Long id);
     
-    // Внутренние методы для получения Entity
-    User getUserEntityById(Long id);
-    
-    // Получение списка пользователей
     List<UserResponse> getAllUsers();
     Page<UserResponse> getAllUsers(Pageable pageable);
     List<UserResponse> getUsersByRole(String role);
     List<UserResponse> getUsersByStatus(String status);
-    
-    // Поиск пользователей
-    List<UserResponse> searchUsers(String query);
-    
-    // Обновление профиля текущего пользователя
+
     UserResponse updateCurrentUserProfile(Authentication authentication, UserUpdateRequest request);
     
-    // Изменение пароля
     void changePassword(Authentication authentication, String oldPassword, String newPassword);
     
-    // Активация/деактивация пользователя
-    UserResponse activateUser(Long id);
-    UserResponse deactivateUser(Long id);
-    
-    // Финансовые операции
     UserResponse updateFinancialInfo(Authentication authentication,
       Double monthlyIncome,
       Double monthlyExpenses,

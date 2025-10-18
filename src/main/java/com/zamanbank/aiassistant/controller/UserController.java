@@ -25,13 +25,19 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "User Management", description = "API для управления пользователями")
 public class UserController {
     
     private final UserService userService;
+    
+    @GetMapping("/test/endpoint")
+    @Operation(summary = "Тестовый endpoint для проверки работы API")
+    public ResponseEntity<String> testEndpoint() {
+        return ResponseEntity.ok("Тестовый endpoint работает! Время: " + java.time.LocalDateTime.now());
+    }
     
     // Получение информации о текущем пользователе
     @GetMapping("/me")
@@ -58,7 +64,12 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+    // Тестовый эндпоинт — для проверки связи с Vapi или фронтом
+    @GetMapping("/test")
+    @Operation(summary = "Тестовый эндпоинт — возвращает число 10 000")
+    public ResponseEntity<BigDecimal> getTestAmount() {
+        return ResponseEntity.ok(BigDecimal.valueOf(10000));
+    }
     // Создание нового пользователя
     @PostMapping
     @Operation(summary = "Создать нового пользователя")
