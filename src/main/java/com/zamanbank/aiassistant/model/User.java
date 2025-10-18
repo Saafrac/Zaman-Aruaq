@@ -39,9 +39,11 @@ public class User {
     private String email;
     
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private UserRole role = UserRole.CLIENT;
     
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
     
     // Финансовые данные

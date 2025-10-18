@@ -4,6 +4,7 @@ import com.zamanbank.aiassistant.model.Transaction;
 import com.zamanbank.aiassistant.model.User;
 import com.zamanbank.aiassistant.model.enums.TransactionCategory;
 import com.zamanbank.aiassistant.model.enums.TransactionType;
+import java.time.LocalDate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -37,4 +38,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Object[]> getExpensesByCategory(@Param("user") User user, 
                                        @Param("startDate") LocalDateTime startDate, 
                                        @Param("endDate") LocalDateTime endDate);
+
+    List<Transaction> findByUserAndTransactionDateBetween(User user, LocalDate startDate, LocalDate endDate);
 }

@@ -1,5 +1,6 @@
 package com.zamanbank.aiassistant.controller;
 
+import com.zamanbank.aiassistant.dto.GoalDto;
 import com.zamanbank.aiassistant.model.FinancialGoal;
 import com.zamanbank.aiassistant.model.User;
 import com.zamanbank.aiassistant.model.enums.GoalStatus;
@@ -27,7 +28,7 @@ public class FinancialGoalController {
     private final UserService userService;
     
     @PostMapping
-    public ResponseEntity<FinancialGoal> createGoal(
+    public ResponseEntity<GoalDto> createGoal(
             @RequestBody CreateGoalRequest request,
             Authentication authentication) {
         
@@ -47,7 +48,8 @@ public class FinancialGoalController {
                     .build();
             
             FinancialGoal savedGoal = goalService.createGoal(goal);
-            return ResponseEntity.ok(savedGoal);
+            GoalDto goalDto = convertToDto(savedGoal);
+            return ResponseEntity.ok(goalDto);
             
         } catch (Exception e) {
             log.error("Ошибка при создании цели", e);
@@ -56,11 +58,14 @@ public class FinancialGoalController {
     }
     
     @GetMapping
-    public ResponseEntity<List<FinancialGoal>> getUserGoals(Authentication authentication) {
+    public ResponseEntity<List<GoalDto>> getUserGoals(Authentication authentication) {
         try {
             User user = userService.getCurrentUser(authentication);
             List<FinancialGoal> goals = goalService.getUserGoals(user);
-            return ResponseEntity.ok(goals);
+            List<GoalDto> goalDtos = goals.stream()
+                    .map(this::convertToDto)
+                    .collect(java.util.stream.Collectors.toList());
+            return ResponseEntity.ok(goalDtos);
         } catch (Exception e) {
             log.error("Ошибка при получении целей", e);
             return ResponseEntity.internalServerError().build();
@@ -68,13 +73,14 @@ public class FinancialGoalController {
     }
     
     @GetMapping("/{goalId}")
-    public ResponseEntity<FinancialGoal> getGoal(
+    public ResponseEntity<GoalDto> getGoal(
             @PathVariable Long goalId,
             Authentication authentication) {
         try {
             User user = userService.getCurrentUser(authentication);
             FinancialGoal goal = goalService.getGoalById(goalId, user);
-            return ResponseEntity.ok(goal);
+            GoalDto goalDto = convertToDto(goal);
+            return ResponseEntity.ok(goalDto);
         } catch (Exception e) {
             log.error("Ошибка при получении цели", e);
             return ResponseEntity.notFound().build();
@@ -82,7 +88,7 @@ public class FinancialGoalController {
     }
     
     @PutMapping("/{goalId}")
-    public ResponseEntity<FinancialGoal> updateGoal(
+    public ResponseEntity<GoalDto> updateGoal(
             @PathVariable Long goalId,
             @RequestBody UpdateGoalRequest request,
             Authentication authentication) {
@@ -99,7 +105,8 @@ public class FinancialGoalController {
             if (request.getStatus() != null) goal.setStatus(request.getStatus());
             
             FinancialGoal updatedGoal = goalService.updateGoal(goal);
-            return ResponseEntity.ok(updatedGoal);
+            GoalDto goalDto = convertToDto(updatedGoal);
+            return ResponseEntity.ok(goalDto);
             
         } catch (Exception e) {
             log.error("Ошибка при обновлении цели", e);
@@ -108,14 +115,15 @@ public class FinancialGoalController {
     }
     
     @PostMapping("/{goalId}/contribute")
-    public ResponseEntity<FinancialGoal> contributeToGoal(
+    public ResponseEntity<GoalDto> contributeToGoal(
             @PathVariable Long goalId,
             @RequestBody ContributionRequest request,
             Authentication authentication) {
         try {
             User user = userService.getCurrentUser(authentication);
             FinancialGoal goal = goalService.contributeToGoal(goalId, request.getAmount(), user);
-            return ResponseEntity.ok(goal);
+            GoalDto goalDto = convertToDto(goal);
+            return ResponseEntity.ok(goalDto);
         } catch (Exception e) {
             log.error("Ошибка при внесении средств в цель", e);
             return ResponseEntity.internalServerError().build();
@@ -192,5 +200,25 @@ public class FinancialGoalController {
         
         public BigDecimal getAmount() { return amount; }
         public void setAmount(BigDecimal amount) { this.amount = amount; }
+    }
+    
+    private GoalDto convertToDto(FinancialGoal goal) {
+        return GoalDto.builder()
+                .id(goal.getId())
+                .title(goal.getTitle())
+                .description(goal.getDescription())
+                .type(goal.getType())
+                .priority(goal.getPriority())
+                .status(goal.getStatus())
+                .targetAmount(goal.getTargetAmount())
+                .currentAmount(goal.getCurrentAmount())
+                .monthlyContribution(goal.getMonthlyContribution())
+                .targetDate(goal.getTargetDate())
+                .createdAt(goal.getCreatedAt())
+                .updatedAt(goal.getUpdatedAt())
+                .progressPercentage(goal.getProgressPercentage())
+                .daysRemaining(goal.getDaysRemaining())
+                .contributionHistory(java.util.Collections.emptyList()) // Mock data
+                .build();
     }
 }

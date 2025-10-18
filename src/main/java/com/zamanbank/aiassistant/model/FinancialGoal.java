@@ -62,10 +62,10 @@ public class FinancialGoal {
     private BigDecimal monthlyContribution;
     
     @CreatedDate
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
     
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private LocalDate updatedAt;
     
     // Прогресс в процентах
     public Double getProgressPercentage() {

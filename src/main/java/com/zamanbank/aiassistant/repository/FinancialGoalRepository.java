@@ -22,4 +22,6 @@ public interface FinancialGoalRepository extends JpaRepository<FinancialGoal, Lo
     
     @Query("SELECT fg FROM FinancialGoal fg WHERE fg.user = :user AND fg.targetDate <= CURRENT_DATE AND fg.status = 'IN_PROGRESS'")
     List<FinancialGoal> findOverdueGoalsByUser(@Param("user") User user);
+
+    List<FinancialGoal> findByUser(User user);
 }
