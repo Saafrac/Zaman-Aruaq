@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { MdSend, MdSmartToy, MdPerson, MdMic, MdMicOff } from 'react-icons/md'
 import AttachmentMenu from './AttachmentMenu'
 
-const ChatInterface = ({ onFileUpload, onStatementUpload, onShowAnalytics, analyticsData }) => {
+const ChatInterface = ({ onFileUpload, onStatementUpload, onShowAnalytics, onShowStatistics, onShowStatisticsDemo, analyticsData }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -126,8 +126,26 @@ const ChatInterface = ({ onFileUpload, onStatementUpload, onShowAnalytics, analy
         <h2>💬 Чат с AI помощником</h2>
         <p>Задавайте вопросы о ваших финансах</p>
         
-        {analyticsData && (
-          <div className="quick-actions">
+        <div className="quick-actions">
+          <button 
+            onClick={() => onShowStatistics(1)}
+            className="action-button statistics-button"
+            title="Показать статистику"
+          >
+            📈
+            <span>Статистика</span>
+          </button>
+          
+          <button 
+            onClick={onShowStatisticsDemo}
+            className="action-button demo-button"
+            title="Демо статистики"
+          >
+            🎯
+            <span>Демо</span>
+          </button>
+          
+          {analyticsData && (
             <button 
               onClick={onShowAnalytics}
               className="action-button analytics-button"
@@ -136,8 +154,8 @@ const ChatInterface = ({ onFileUpload, onStatementUpload, onShowAnalytics, analy
               📊
               <span>Аналитика</span>
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="chat-messages">

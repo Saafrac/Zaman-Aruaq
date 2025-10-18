@@ -225,6 +225,26 @@ body {
   box-shadow: 0 6px 20px rgba(78, 205, 196, 0.3);
 }
 
+.statistics-button {
+  background: linear-gradient(135deg, #2D9A86, #1e7a6b);
+  color: var(--white);
+}
+
+.statistics-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(45, 154, 134, 0.3);
+}
+
+.demo-button {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: var(--white);
+}
+
+.demo-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+}
+
 .chat-header h2 {
   font-size: 2rem;
   font-weight: 800;
@@ -1110,12 +1130,14 @@ body {
   background: var(--white);
   border-radius: 24px;
   padding: 2rem;
-  max-width: 90vw;
-  max-height: 90vh;
+  max-width: 95vw;
+  max-height: 95vh;
   overflow-y: auto;
+  overflow-x: visible;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
   position: relative;
+  box-sizing: border-box;
 }
 
 @keyframes slideUp {
@@ -1132,6 +1154,17 @@ body {
 .analytics-modal {
   max-width: 95vw;
   width: 1200px;
+}
+
+.statistics-modal {
+  max-width: 98vw;
+  width: 1400px;
+  overflow: visible;
+}
+
+.statistics-demo-modal {
+  max-width: 90vw;
+  width: 600px;
 }
 
 .modal-content .close-button {
