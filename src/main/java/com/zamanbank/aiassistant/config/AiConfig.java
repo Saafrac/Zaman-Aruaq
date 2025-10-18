@@ -1,7 +1,7 @@
 package com.zamanbank.aiassistant.config;
 
-import org.springframework.ai.chat.ChatClient;
-import org.springframework.ai.chat.ChatModel;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
@@ -14,10 +14,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class AiConfig {
     
-    @Value("${ai.openai.api-key}")
+    @Value("${spring.ai.openai.api-key}")
     private String apiKey;
     
-    @Value("${ai.openai.base-url}")
+    @Value("${spring.ai.openai.base-url}")
     private String baseUrl;
     
     @Bean
@@ -32,7 +32,9 @@ public class AiConfig {
     
     @Bean
     public ChatClient chatClient(ChatModel chatModel) {
-        return ChatClient.builder(chatModel).build();
+        return ChatClient.builder(chatModel)
+                .defaultSystem("You are a helpful AI assistant for Zaman Bank, specializing in Islamic finance.")
+                .build();
     }
     
     @Bean

@@ -2,11 +2,12 @@ package com.zamanbank.aiassistant.service.impl;
 
 import com.zamanbank.aiassistant.service.AiService;
 import com.zamanbank.aiassistant.model.*;
+import com.zamanbank.aiassistant.model.enums.*;
 import com.zamanbank.aiassistant.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.ChatClient;
-import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -37,10 +38,10 @@ public class OpenAiService implements AiService {
     private final EmbeddingModel embeddingModel;
     private final WebClient webClient;
     
-    @Value("${ai.openai.api-key}")
+    @Value("${spring.ai.openai.api-key}")
     private String apiKey;
     
-    @Value("${ai.openai.base-url}")
+    @Value("${spring.ai.openai.base-url}")
     private String baseUrl;
     
     @Override
@@ -54,10 +55,10 @@ public class OpenAiService implements AiService {
             String fullPrompt = systemPrompt + "\n\nКонтекст пользователя:\n" + context + 
                                "\n\nСообщение пользователя: " + userMessage;
             
-            Prompt prompt = new Prompt(fullPrompt);
-            ChatResponse response = chatClient.call(prompt);
-            
-            String aiResponse = response.getResult().getOutput().getContent();
+            String aiResponse = chatClient.prompt()
+                    .user(fullPrompt)
+                    .call()
+                    .content();
             
             // Анализируем намерения и тональность
             String intent = extractIntent(userMessage);
@@ -97,10 +98,10 @@ public class OpenAiService implements AiService {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             
             // Анализируем категории расходов
-            Map<TransactionCategory, BigDecimal> expensesByCategory = transactions.stream()
+            Map<String, BigDecimal> expensesByCategory = transactions.stream()
                     .filter(t -> t.getType() == TransactionType.EXPENSE)
                     .collect(Collectors.groupingBy(
-                            Transaction::getCategory,
+                            t -> t.getCategory().toString(),
                             Collectors.reducing(BigDecimal.ZERO, Transaction::getAmount, BigDecimal::add)
                     ));
             
@@ -115,9 +116,10 @@ public class OpenAiService implements AiService {
                     totalIncome, totalExpenses, user.getCurrentSavings(), expensesByCategory
             );
             
-            Prompt prompt = new Prompt(analysisPrompt);
-            ChatResponse response = chatClient.call(prompt);
-            String aiRecommendations = response.getResult().getOutput().getContent();
+            String aiRecommendations = chatClient.prompt()
+                    .user(analysisPrompt)
+                    .call()
+                    .content();
             
             return FinancialAnalysis.builder()
                     .totalIncome(totalIncome)
@@ -147,9 +149,10 @@ public class OpenAiService implements AiService {
                     user.getMonthlyIncome()
             );
             
-            Prompt aiPrompt = new Prompt(prompt);
-            ChatResponse response = chatClient.call(aiPrompt);
-            String recommendations = response.getResult().getOutput().getContent();
+            String recommendations = chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content();
             
             // Парсим рекомендации и создаем объекты
             return parseGoalRecommendations(recommendations, goals);
@@ -171,9 +174,10 @@ public class OpenAiService implements AiService {
                     goalType, user.getRiskProfile(), user.getFinancialGoals()
             );
             
-            Prompt aiPrompt = new Prompt(prompt);
-            ChatResponse response = chatClient.call(aiPrompt);
-            String recommendations = response.getResult().getOutput().getContent();
+            String recommendations = chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content();
             
             return parseProductRecommendations(recommendations);
             
@@ -222,9 +226,10 @@ public class OpenAiService implements AiService {
                     goal.getDaysRemaining()
             );
             
-            Prompt aiPrompt = new Prompt(prompt);
-            ChatResponse response = chatClient.call(aiPrompt);
-            return response.getResult().getOutput().getContent();
+            return chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content();
             
         } catch (Exception e) {
             log.error("Ошибка при генерации мотивационного сообщения", e);
@@ -239,9 +244,10 @@ public class OpenAiService implements AiService {
                            "Предложите альтернативные способы борьбы со стрессом, основанные на исламских принципах: " +
                            "молитва, медитация, физическая активность, общение с близкими, хобби.";
             
-            Prompt aiPrompt = new Prompt(prompt);
-            ChatResponse response = chatClient.call(aiPrompt);
-            return response.getResult().getOutput().getContent();
+            return chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content();
             
         } catch (Exception e) {
             log.error("Ошибка при генерации рекомендаций по борьбе со стрессом", e);
@@ -287,9 +293,11 @@ public class OpenAiService implements AiService {
     public String analyzeSentiment(String message) {
         try {
             String prompt = "Определите тональность сообщения (positive, negative, neutral): " + message;
-            Prompt aiPrompt = new Prompt(prompt);
-            ChatResponse response = chatClient.call(aiPrompt);
-            return response.getResult().getOutput().getContent().toLowerCase();
+            return chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content()
+                    .toLowerCase();
         } catch (Exception e) {
             log.error("Ошибка при анализе тональности", e);
             return "neutral";
@@ -301,9 +309,11 @@ public class OpenAiService implements AiService {
         try {
             String prompt = "Определите намерение пользователя из сообщения: " + message + 
                            "\nВозможные намерения: goal_setting, transaction_analysis, product_inquiry, stress_relief, general_question";
-            Prompt aiPrompt = new Prompt(prompt);
-            ChatResponse response = chatClient.call(aiPrompt);
-            return response.getResult().getOutput().getContent().toLowerCase();
+            return chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content()
+                    .toLowerCase();
         } catch (Exception e) {
             log.error("Ошибка при извлечении намерений", e);
             return "general_question";

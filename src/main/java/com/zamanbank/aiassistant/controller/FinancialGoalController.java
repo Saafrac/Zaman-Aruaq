@@ -5,6 +5,7 @@ import com.zamanbank.aiassistant.model.FinancialGoal;
 import com.zamanbank.aiassistant.model.User;
 import com.zamanbank.aiassistant.model.enums.GoalStatus;
 import com.zamanbank.aiassistant.model.enums.GoalType;
+import com.zamanbank.aiassistant.model.enums.GoalPriority;
 import com.zamanbank.aiassistant.service.AiService;
 import com.zamanbank.aiassistant.service.FinancialGoalService;
 import com.zamanbank.aiassistant.service.UserService;
@@ -41,7 +42,7 @@ public class FinancialGoalController {
                     .title(request.getTitle())
                     .description(request.getDescription())
                     .type(request.getType())
-                    .priority(request.getPriority())
+                    .priority(GoalPriority.valueOf(request.getPriority()))
                     .status(GoalStatus.PLANNING)
                     .targetAmount(request.getTargetAmount())
                     .targetDate(request.getTargetDate())

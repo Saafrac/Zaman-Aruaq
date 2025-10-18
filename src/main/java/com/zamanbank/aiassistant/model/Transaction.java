@@ -1,5 +1,7 @@
 package com.zamanbank.aiassistant.model;
 
+import com.zamanbank.aiassistant.model.enums.TransactionCategory;
+import com.zamanbank.aiassistant.model.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

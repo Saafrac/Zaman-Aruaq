@@ -1,5 +1,8 @@
 package com.zamanbank.aiassistant.model;
 
+import com.zamanbank.aiassistant.model.enums.GoalPriority;
+import com.zamanbank.aiassistant.model.enums.GoalStatus;
+import com.zamanbank.aiassistant.model.enums.GoalType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,6 +52,7 @@ public class FinancialGoal {
     private BigDecimal targetAmount;
     
     @Column(precision = 15, scale = 2)
+    @Builder.Default
     private BigDecimal currentAmount = BigDecimal.ZERO;
     
     @Column(nullable = false)
