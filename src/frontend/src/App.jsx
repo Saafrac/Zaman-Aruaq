@@ -123,12 +123,12 @@ function App() {
               </div>
             </div>
           )}
-          
-          {showRealtimeChat && (
-            <RealtimeChat onClose={closeModals} />
-          )}
         </div>
       </div>
+      
+      {showRealtimeChat && (
+        <RealtimeChat onClose={closeModals} />
+      )}
     </div>
   )
 }

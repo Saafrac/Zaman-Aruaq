@@ -17,6 +17,9 @@ const formatMessageText = (text) => {
   // Заменяем \n на <br/>
   formattedText = formattedText.replace(/\\n/g, '<br/>')
 
+  // Добавляем перенос строки перед нумерованными списками (например, " 1. ", " 2. ")
+  formattedText = formattedText.replace(/\s(\d+)\.\s/g, '<br/>$1. ')
+
   return formattedText
 }
 
@@ -322,30 +325,12 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, onShowStatistics, 
 
           <div className="quick-actions">
             <button
-                onClick={onShowRealtimeChat}
-                className="action-button realtime-button"
-                title="Realtime голосовое общение"
-            >
-              🎤
-              <span>Realtime</span>
-            </button>
-
-            <button
                 onClick={() => onShowStatistics(1)}
                 className="action-button statistics-button"
                 title="Показать статистику"
             >
               📈
               <span>Статистика</span>
-            </button>
-
-            <button
-                onClick={onShowStatisticsDemo}
-                className="action-button demo-button"
-                title="Демо статистики"
-            >
-              🎯
-              <span>Демо</span>
             </button>
 
             {analyticsData && (
@@ -358,6 +343,15 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, onShowStatistics, 
                   <span>Аналитика</span>
                 </button>
             )}
+
+            {/* <button
+                onClick={onShowStatisticsDemo}
+                className="action-button demo-button"
+                title="Демо статистики"
+            >
+              🎯
+              <span>Демо</span>
+            </button> */}
           </div>
         </div>
 
@@ -466,6 +460,14 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, onShowStatistics, 
             />
 
             <div className="input-actions">
+              <button
+                  onClick={onShowRealtimeChat}
+                  className="action-button realtime-button"
+                  title="Realtime голосовое общение"
+              >
+                🎤
+              </button>
+
               <div className="voice-control">
                 <button
                     onClick={isListening ? stopVoiceRecognition : startVoiceRecognition}

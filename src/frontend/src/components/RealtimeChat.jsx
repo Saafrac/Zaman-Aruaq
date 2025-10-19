@@ -212,6 +212,37 @@ const RealtimeChat = ({ onClose }) => {
     if (ringRef.current) ringRef.current.classList.remove('playing')
   }
 
+  const handleClose = () => {
+    // Останавливаем запись если она идёт
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop()
+      // Останавливаем все треки
+      const stream = mediaRecorderRef.current.stream
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop())
+      }
+    }
+    
+    // Останавливаем воспроизведение
+    stopAudio()
+    
+    // Сбрасываем состояния
+    setIsRecording(false)
+    setIsPlaying(false)
+    setStatusText('Нажмите чтобы говорить')
+    if (orbRef.current) {
+      orbRef.current.classList.remove('listening')
+      orbRef.current.classList.remove('playing')
+    }
+    if (ringRef.current) {
+      ringRef.current.classList.remove('listening')
+      ringRef.current.classList.remove('playing')
+    }
+    
+    // Закрываем окно
+    onClose()
+  }
+
   const handleOrbClick = () => {
     if (isPlaying) {
       stopAudio()
@@ -230,7 +261,7 @@ const RealtimeChat = ({ onClose }) => {
   return (
     <div className="realtime-chat-overlay">
       <div className="realtime-chat-container">
-        <button className="close-button" onClick={onClose}>
+        <button className="close-button" onClick={handleClose}>
           <MdClose size={24} />
         </button>
         

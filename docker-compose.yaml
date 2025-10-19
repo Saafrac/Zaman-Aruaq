@@ -1,0 +1,66 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: zaman-postgres
+    environment:
+      POSTGRES_DB: zaman_ai_assistant
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/main/resources/db/changelog:/docker-entrypoint-initdb.d
+    networks:
+      - zaman-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d zaman_ai_assistant"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Application
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zaman-backend
+    environment:
+      # Database Configuration
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: zaman_ai_assistant
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+      
+      # Application Configuration
+      PORT: 8080
+      SPRING_PROFILES_ACTIVE: docker
+      
+      # JVM Configuration
+      JAVA_OPTS: "-Xmx512m -Xms256m -XX:+UseG1GC"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./temp:/app/temp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - zaman-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+volumes:
+  postgres_data:
+
+networks:
+  zaman-network:
+    driver: bridge
