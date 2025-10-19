@@ -3,6 +3,7 @@ import ChatInterface from './components/ChatInterface'
 import FileUpload from './components/FileUpload'
 import BankStatementUpload from './components/BankStatementUpload'
 import AnalyticsDashboard from './components/AnalyticsDashboard'
+import RealtimeChat from './components/RealtimeChat'
 import Header from './components/Header'
 import './App.css'
 
@@ -11,6 +12,7 @@ function App() {
   const [showFileUpload, setShowFileUpload] = useState(false)
   const [showStatementUpload, setShowStatementUpload] = useState(false)
   const [showAnalytics, setShowAnalytics] = useState(false)
+  const [showRealtimeChat, setShowRealtimeChat] = useState(false)
 
   const handleAnalyticsData = (data) => {
     setAnalyticsData(data)
@@ -35,6 +37,7 @@ function App() {
     setShowFileUpload(false)
     setShowStatementUpload(false)
     setShowAnalytics(false)
+    setShowRealtimeChat(false)
   }
 
   return (
@@ -44,9 +47,8 @@ function App() {
       <div className="main-container">
         <div className="content">
           <ChatInterface 
-            onFileUpload={handleFileUpload}
-            onStatementUpload={handleStatementUpload}
             onShowAnalytics={() => setShowAnalytics(true)}
+            onShowRealtimeChat={() => setShowRealtimeChat(true)}
             analyticsData={analyticsData}
           />
           
@@ -72,6 +74,10 @@ function App() {
                 <AnalyticsDashboard data={analyticsData} onClose={closeModals} />
               </div>
             </div>
+          )}
+          
+          {showRealtimeChat && (
+            <RealtimeChat onClose={closeModals} />
           )}
         </div>
       </div>

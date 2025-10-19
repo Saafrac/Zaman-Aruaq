@@ -1,0 +1,232 @@
+.realtime-chat-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.realtime-chat-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(20px);
+}
+
+.close-button {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background: #FFFFFF;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #2D9A86;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.close-button:hover {
+  background: #ff6b6b;
+  color: #FFFFFF;
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 12px 40px rgba(255, 107, 107, 0.3);
+}
+
+.orb-container {
+  position: relative;
+  margin-bottom: 50px;
+}
+
+.orb {
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle at 30% 30%, #2D9A86, #1e7a6b);
+  border-radius: 50%;
+  box-shadow: 0 0 60px rgba(45, 154, 134, 0.4), 0 8px 32px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  border: 4px solid #FFFFFF;
+}
+
+.orb:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 80px rgba(45, 154, 134, 0.6), 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.orb.listening {
+  background: radial-gradient(circle at 30% 30%, #2D9A86, #20c997);
+  box-shadow: 0 0 80px rgba(45, 154, 134, 0.8), 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: pulse-listening 1s ease-in-out infinite;
+}
+
+.orb.playing {
+  background: radial-gradient(circle at 30% 30%, #EEFE6D, #d4e157);
+  box-shadow: 0 0 80px rgba(238, 254, 109, 0.8), 0 8px 32px rgba(0, 0, 0, 0.1);
+  animation: pulse-playing 1s ease-in-out infinite;
+}
+
+.ring {
+  position: absolute;
+  top: -25px;
+  left: -25px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  border: 3px solid rgba(45, 154, 134, 0.3);
+  box-shadow: 0 0 40px rgba(45, 154, 134, 0.3);
+  animation: pulse 2s infinite;
+  z-index: 1;
+  pointer-events: none;
+  background: transparent;
+}
+
+.ring.listening {
+  animation: vibrate 0.4s infinite;
+  border-color: rgba(45, 154, 134, 0.6);
+  box-shadow: 0 0 60px rgba(45, 154, 134, 0.6);
+}
+
+.ring.playing {
+  animation: glow 1s ease-in-out infinite alternate;
+  border-color: rgba(238, 254, 109, 0.6);
+  box-shadow: 0 0 60px rgba(238, 254, 109, 0.6);
+}
+
+.status-text {
+  color: #2D9A86;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 30px;
+  min-height: 28px;
+  transition: all 0.3s ease;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.status-text:empty::before {
+  content: 'Нажмите чтобы говорить';
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 0.6; 
+  }
+  50% { 
+    transform: scale(1.2); 
+    opacity: 1; 
+  }
+}
+
+@keyframes pulse-listening {
+  0%, 100% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(1.05); 
+  }
+}
+
+@keyframes pulse-playing {
+  0%, 100% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(1.05); 
+  }
+}
+
+@keyframes vibrate {
+  0% { transform: scale(1.05); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1.05); }
+}
+
+@keyframes glow {
+  0% { 
+    border-color: rgba(238, 254, 109, 0.4);
+    box-shadow: 0 0 40px rgba(238, 254, 109, 0.5); 
+  }
+  100% { 
+    border-color: rgba(238, 254, 109, 0.8);
+    box-shadow: 0 0 80px rgba(238, 254, 109, 0.8); 
+  }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .orb {
+    width: 180px;
+    height: 180px;
+  }
+  
+  .ring {
+    width: 230px;
+    height: 230px;
+    top: -25px;
+    left: -25px;
+  }
+  
+  .status-text {
+    font-size: 18px;
+    padding: 0.75rem 1.5rem;
+    margin: 0 1rem;
+  }
+  
+  .close-button {
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .orb {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .ring {
+    width: 200px;
+    height: 200px;
+    top: -25px;
+    left: -25px;
+  }
+  
+  .status-text {
+    font-size: 16px;
+    padding: 0.5rem 1rem;
+  }
+  
+  .close-button {
+    top: 15px;
+    right: 15px;
+  }
+}
