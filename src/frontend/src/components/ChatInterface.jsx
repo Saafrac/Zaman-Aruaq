@@ -13,10 +13,10 @@ const formatMessageText = (text) => {
 
   // Заменяем **текст** на <strong>текст</strong>
   let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  
+
   // Заменяем \n на <br/>
   formattedText = formattedText.replace(/\\n/g, '<br/>')
-  
+
   return formattedText
 }
 
@@ -40,7 +40,7 @@ const getFileIcon = (fileName, fileType) => {
   return <MdInsertDriveFile size={32} color="#7f8c8d" />
 }
 
-const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) => {
+const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, onShowStatistics, onShowStatisticsDemo, analyticsData }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -96,7 +96,7 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) =
       const formData = new FormData()
       formData.append('chatInput', messageText)
       formData.append('sessionId', sessionId)
-      
+
       // Добавляем файл если есть
       if (fileToSend) {
         formData.append('data', fileToSend, fileToSend.name)
@@ -108,14 +108,14 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) =
         console.log(key, ':', value instanceof File ? `File: ${value.name}` : value)
       }
 
-      const response = await fetch('https://saafrac.app.n8n.cloud/webhook-test/bank', {
+      const response = await fetch('https://saafrac.app.n8n.cloud/webhook/bank', {
         method: 'POST',
         body: formData
         // НЕ указываем Content-Type - браузер сам установит multipart/form-data с boundary
       })
 
       const data = await response.json()
-      
+
       // n8n возвращает массив с объектом, содержащим поле output
       let responseText = "Сообщение получено"
       if (Array.isArray(data) && data.length > 0 && data[0].output) {
@@ -127,7 +127,7 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) =
       } else if (data.message) {
         responseText = data.message
       }
-      
+
       const botMessage = {
         id: Date.now() + 1,
         text: responseText,
@@ -164,7 +164,7 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) =
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     const recognitionInstance = new SpeechRecognition()
-    
+
     recognitionInstance.lang = 'ru-RU'
     recognitionInstance.interimResults = false
     recognitionInstance.continuous = false
@@ -175,7 +175,7 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) =
 
     recognitionInstance.onresult = async (event) => {
       const transcript = event.results[0][0].transcript
-      
+
       if (transcript.trim() === "") {
         setIsListening(false)
         return
@@ -202,14 +202,14 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) =
           console.log(key, ':', value)
         }
 
-        const response = await fetch('https://saafrac.app.n8n.cloud/webhook-test/bank', {
+        const response = await fetch('https://saafrac.app.n8n.cloud/webhook/bank', {
           method: 'POST',
           body: formData
           // НЕ указываем Content-Type - браузер сам установит multipart/form-data с boundary
         })
 
         const data = await response.json()
-        
+
         let responseText = "Сообщение получено"
         if (Array.isArray(data) && data.length > 0 && data[0].output) {
           responseText = data[0].output
@@ -220,7 +220,7 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) =
         } else if (data.message) {
           responseText = data.message
         }
-        
+
         const botMessage = {
           id: Date.now() + 1,
           text: responseText,
@@ -266,7 +266,7 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) =
     const file = e.target.files[0]
     if (file) {
       setAttachedFile(file)
-      
+
       // Создаем превью для изображений
       if (file.type.startsWith('image/')) {
         const reader = new FileReader()
@@ -294,7 +294,7 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) =
       const file = e.target.files[0]
       if (file) {
         setAttachedFile(file)
-        
+
         // Создаем превью для изображения
         const reader = new FileReader()
         reader.onload = (e) => {
@@ -315,174 +315,192 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) =
   }
 
   return (
-    <div className="chat-interface">
-      <div className="chat-header">
-        <h2>💬 Чат с AI помощником</h2>
-        <p>Задавайте вопросы о ваших финансах</p>
-        
-        <div className="quick-actions">
-          <button 
-            onClick={onShowRealtimeChat}
-            className="action-button realtime-button"
-            title="Realtime голосовое общение"
-          >
-            🎤
-            <span>Realtime</span>
-          </button>
-          
-          {analyticsData && (
-            <button 
-              onClick={onShowAnalytics}
-              className="action-button analytics-button"
-              title="Показать аналитику"
+      <div className="chat-interface">
+        <div className="chat-header">
+          <h2>💬 Чат с AI помощником</h2>
+          <p>Задавайте вопросы о ваших финансах</p>
+
+          <div className="quick-actions">
+            <button
+                onClick={onShowRealtimeChat}
+                className="action-button realtime-button"
+                title="Realtime голосовое общение"
             >
-              📊
-              <span>Аналитика</span>
+              🎤
+              <span>Realtime</span>
             </button>
-          )}
-        </div>
-      </div>
 
-      <div className="chat-messages">
-        {messages.map((message) => (
-          <div key={message.id} className={`message ${message.sender}`}>
-            <div className="message-avatar">
-              {message.sender === 'bot' ? <MdSmartToy size={20} /> : <MdPerson size={20} />}
-            </div>
-            <div className="message-content">
-              {message.imagePreview && (
-                <div className="message-image">
-                  <img src={message.imagePreview} alt="Attached" />
-                </div>
-              )}
-              {message.file && !message.imagePreview && (
-                <div className="message-file">
-                  <div className="file-icon">
-                    {getFileIcon(message.file.name, message.file.type)}
-                  </div>
-                  <div className="file-info">
-                    <div className="file-name">{message.file.name}</div>
-                    <div className="file-size">{(message.file.size / 1024).toFixed(2)} KB</div>
-                  </div>
-                </div>
-              )}
-              {message.text && (
-                <div 
-                  className="message-text" 
-                  dangerouslySetInnerHTML={{ __html: formatMessageText(message.text) }}
-                />
-              )}
-              <div className="message-time">
-                {message.timestamp.toLocaleTimeString()}
-              </div>
-            </div>
-          </div>
-        ))}
-        
-        {isLoading && (
-          <div className="message bot">
-            <div className="message-avatar">
-              <MdSmartToy size={20} />
-            </div>
-            <div className="message-content">
-              <div className="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        <div ref={messagesEndRef} />
-      </div>
+            <button
+                onClick={() => onShowStatistics(1)}
+                className="action-button statistics-button"
+                title="Показать статистику"
+            >
+              📈
+              <span>Статистика</span>
+            </button>
 
-      <div className="chat-input">
-        {attachedFile && (
-          <div className="attached-file-preview">
-            {imagePreview ? (
-              <div className="image-preview-container">
-                <img src={imagePreview} alt="Preview" className="image-preview" />
-                <span className="file-name">{attachedFile.name}</span>
-              </div>
-            ) : (
-              <span className="file-name">📎 {attachedFile.name}</span>
+            <button
+                onClick={onShowStatisticsDemo}
+                className="action-button demo-button"
+                title="Демо статистики"
+            >
+              🎯
+              <span>Демо</span>
+            </button>
+
+            {analyticsData && (
+                <button
+                    onClick={onShowAnalytics}
+                    className="action-button analytics-button"
+                    title="Показать аналитику"
+                >
+                  📊
+                  <span>Аналитика</span>
+                </button>
             )}
-            <button 
-              onClick={removeAttachedFile}
-              className="remove-file-button"
-              title="Удалить файл"
-            >
-              <MdClose size={16} />
-            </button>
           </div>
-        )}
-        
-        <div className={`input-container ${isListening ? 'recording' : ''} ${isLoading ? 'loading' : ''}`}>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            style={{ display: 'none' }}
-            accept="image/*,.pdf,.doc,.docx,.txt,.xlsx,.xls"
-          />
-          
-          <AttachmentMenu 
-            onAttachmentClick={handleAttachmentClick}
-            onPhotoClick={handlePhotoClick}
-          />
-          
-          <textarea
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={
-              isLoading 
-                ? "⏳ Генерируется ответ, подождите..." 
-                : isListening 
-                  ? "🎤 Идет запись голоса..." 
-                  : "Введите ваш вопрос..."
-            }
-            rows="1"
-            disabled={isLoading || isListening}
-          />
-          
-          <div className="input-actions">
-            <div className="voice-control">
-              <button 
-                onClick={isListening ? stopVoiceRecognition : startVoiceRecognition}
-                className={`voice-button ${isListening ? 'listening' : ''}`}
-                title={
-                  isLoading 
-                    ? "Подождите, генерируется ответ" 
-                    : isListening 
-                      ? "Нажмите еще раз чтобы отправить аудио" 
-                      : "Нажмите чтобы начать запись"
-                }
-                disabled={isLoading}
-              >
-                {isListening ? <MdMicOff size={20} /> : <MdMic size={20} />}
-              </button>
-              {isListening && (
-                <div className="voice-recording-indicator">
-                  <div className="recording-dot"></div>
-                  <span>Запись... Нажмите еще раз для отправки</span>
+        </div>
+
+        <div className="chat-messages">
+          {messages.map((message) => (
+              <div key={message.id} className={`message ${message.sender}`}>
+                <div className="message-avatar">
+                  {message.sender === 'bot' ? <MdSmartToy size={20} /> : <MdPerson size={20} />}
                 </div>
-              )}
+                <div className="message-content">
+                  {message.imagePreview && (
+                      <div className="message-image">
+                        <img src={message.imagePreview} alt="Attached" />
+                      </div>
+                  )}
+                  {message.file && !message.imagePreview && (
+                      <div className="message-file">
+                        <div className="file-icon">
+                          {getFileIcon(message.file.name, message.file.type)}
+                        </div>
+                        <div className="file-info">
+                          <div className="file-name">{message.file.name}</div>
+                          <div className="file-size">{(message.file.size / 1024).toFixed(2)} KB</div>
+                        </div>
+                      </div>
+                  )}
+                  {message.text && (
+                      <div
+                          className="message-text"
+                          dangerouslySetInnerHTML={{ __html: formatMessageText(message.text) }}
+                      />
+                  )}
+                  <div className="message-time">
+                    {message.timestamp.toLocaleTimeString()}
+                  </div>
+                </div>
+              </div>
+          ))}
+
+          {isLoading && (
+              <div className="message bot">
+                <div className="message-avatar">
+                  <MdSmartToy size={20} />
+                </div>
+                <div className="message-content">
+                  <div className="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="chat-input">
+          {attachedFile && (
+              <div className="attached-file-preview">
+                {imagePreview ? (
+                    <div className="image-preview-container">
+                      <img src={imagePreview} alt="Preview" className="image-preview" />
+                      <span className="file-name">{attachedFile.name}</span>
+                    </div>
+                ) : (
+                    <span className="file-name">📎 {attachedFile.name}</span>
+                )}
+                <button
+                    onClick={removeAttachedFile}
+                    className="remove-file-button"
+                    title="Удалить файл"
+                >
+                  <MdClose size={16} />
+                </button>
+              </div>
+          )}
+
+          <div className={`input-container ${isListening ? 'recording' : ''} ${isLoading ? 'loading' : ''}`}>
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                style={{ display: 'none' }}
+                accept="image/*,.pdf,.doc,.docx,.txt,.xlsx,.xls"
+            />
+
+            <AttachmentMenu
+                onAttachmentClick={handleAttachmentClick}
+                onPhotoClick={handlePhotoClick}
+            />
+
+            <textarea
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={
+                  isLoading
+                      ? "⏳ Генерируется ответ, подождите..."
+                      : isListening
+                          ? "🎤 Идет запись голоса..."
+                          : "Введите ваш вопрос..."
+                }
+                rows="1"
+                disabled={isLoading || isListening}
+            />
+
+            <div className="input-actions">
+              <div className="voice-control">
+                <button
+                    onClick={isListening ? stopVoiceRecognition : startVoiceRecognition}
+                    className={`voice-button ${isListening ? 'listening' : ''}`}
+                    title={
+                      isLoading
+                          ? "Подождите, генерируется ответ"
+                          : isListening
+                              ? "Нажмите еще раз чтобы отправить аудио"
+                              : "Нажмите чтобы начать запись"
+                    }
+                    disabled={isLoading}
+                >
+                  {isListening ? <MdMicOff size={20} /> : <MdMic size={20} />}
+                </button>
+                {isListening && (
+                    <div className="voice-recording-indicator">
+                      <div className="recording-dot"></div>
+                      <span>Запись... Нажмите еще раз для отправки</span>
+                    </div>
+                )}
+              </div>
+
+              <button
+                  onClick={handleSendMessage}
+                  disabled={(!inputMessage.trim() && !attachedFile) || isLoading}
+                  className="send-button"
+                  title={isLoading ? "Подождите, генерируется ответ" : "Отправить сообщение"}
+              >
+                <MdSend size={20} />
+              </button>
             </div>
-            
-            <button 
-              onClick={handleSendMessage}
-              disabled={(!inputMessage.trim() && !attachedFile) || isLoading}
-              className="send-button"
-              title={isLoading ? "Подождите, генерируется ответ" : "Отправить сообщение"}
-            >
-              <MdSend size={20} />
-            </button>
           </div>
         </div>
       </div>
-    </div>
   )
 }
 
