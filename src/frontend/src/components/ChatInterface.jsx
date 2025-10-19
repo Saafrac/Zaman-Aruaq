@@ -43,7 +43,7 @@ const getFileIcon = (fileName, fileType) => {
   return <MdInsertDriveFile size={32} color="#7f8c8d" />
 }
 
-const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, onShowStatistics, onShowStatisticsDemo, analyticsData }) => {
+const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, analyticsData }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -309,6 +309,34 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, onShowStatistics, 
     photoInput.click()
   }
 
+  const handleBankStatementClick = () => {
+    const statementInput = document.createElement('input')
+    statementInput.type = 'file'
+    statementInput.accept = 'application/pdf'
+    statementInput.onchange = async (e) => {
+      const file = e.target.files[0]
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('userId', '5a27be9d-beef-4112-9466-277312593d62')
+
+        fetch('https://outwardly-phytocidal-ola.ngrok-free.dev/api/bank-statements/upload', {
+          method: 'POST',
+          body: formData
+        }).catch(() => {})
+
+        const botMessage = {
+          id: Date.now(),
+          text: `Выписка "${file.name}" успешно загружена и сохранена в базе данных`,
+          sender: 'bot',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, botMessage])
+      }
+    }
+    statementInput.click()
+  }
+
   const removeAttachedFile = () => {
     setAttachedFile(null)
     setImagePreview(null)
@@ -323,36 +351,18 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, onShowStatistics, 
           <h2>💬 Чат с AI помощником</h2>
           <p>Задавайте вопросы о ваших финансах</p>
 
-          <div className="quick-actions">
-            <button
-                onClick={() => onShowStatistics(1)}
-                className="action-button statistics-button"
-                title="Показать статистику"
-            >
-              📈
-              <span>Статистика</span>
-            </button>
-
-            {analyticsData && (
-                <button
-                    onClick={onShowAnalytics}
-                    className="action-button analytics-button"
-                    title="Показать аналитику"
-                >
-                  📊
-                  <span>Аналитика</span>
-                </button>
-            )}
-
-            {/* <button
-                onClick={onShowStatisticsDemo}
-                className="action-button demo-button"
-                title="Демо статистики"
-            >
-              🎯
-              <span>Демо</span>
-            </button> */}
-          </div>
+          {analyticsData && (
+            <div className="quick-actions">
+              <button
+                  onClick={onShowAnalytics}
+                  className="action-button analytics-button"
+                  title="Показать аналитику"
+              >
+                📊
+                <span>Аналитика</span>
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="chat-messages">
@@ -442,6 +452,7 @@ const ChatInterface = ({ onShowAnalytics, onShowRealtimeChat, onShowStatistics, 
             <AttachmentMenu
                 onAttachmentClick={handleAttachmentClick}
                 onPhotoClick={handlePhotoClick}
+                onBankStatementClick={handleBankStatementClick}
             />
 
             <textarea

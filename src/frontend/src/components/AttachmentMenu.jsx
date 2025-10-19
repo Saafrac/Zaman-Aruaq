@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import { MdAttachFile, MdInsertDriveFile, MdCameraAlt } from 'react-icons/md'
+import { MdAttachFile, MdInsertDriveFile, MdCameraAlt, MdAccountBalance } from 'react-icons/md'
 
-const AttachmentMenu = ({ onAttachmentClick, onPhotoClick }) => {
+const AttachmentMenu = ({ onAttachmentClick, onPhotoClick, onBankStatementClick }) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -25,6 +25,11 @@ const AttachmentMenu = ({ onAttachmentClick, onPhotoClick }) => {
 
   const handlePhotoAttachClick = () => {
     onPhotoClick()
+    setIsOpen(false)
+  }
+
+  const handleBankStatementClick = () => {
+    onBankStatementClick()
     setIsOpen(false)
   }
 
@@ -54,6 +59,14 @@ const AttachmentMenu = ({ onAttachmentClick, onPhotoClick }) => {
           >
             <MdCameraAlt size={18} />
             <span>Фото / Камера</span>
+          </button>
+
+          <button 
+            className="dropdown-item"
+            onClick={handleBankStatementClick}
+          >
+            <MdAccountBalance size={18} />
+            <span>Выписка</span>
           </button>
         </div>
       )}

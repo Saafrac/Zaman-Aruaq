@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'https://outwardly-phytocidal-ola.ngrok-free.dev/api';
 
 // Default test user ID (UUID format)
-const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000001';
+const DEFAULT_USER_ID = '5a27be9d-beef-4112-9466-277312593d62';
 
 // Mock data for development when backend is not available
 const mockUserStatistics = {
@@ -59,8 +59,11 @@ export const statisticsApi = {
   // Получить статистику пользователя
   getUserStatistics: async (userId) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/statistics/user/${userId}`, {
-        timeout: 5000 // 5 second timeout
+      const response = await axios.get(`${API_BASE_URL}/statistics/user/5a27be9d-beef-4112-9466-277312593d62`, {
+        timeout: 5000, // 5 second timeout
+        headers: {
+          'ngrok-skip-browser-warning': 'true'
+        }
       });
       return response.data;
     } catch (error) {
@@ -80,7 +83,10 @@ export const statisticsApi = {
   getOverviewStatistics: async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/statistics/overview`, {
-        timeout: 5000 // 5 second timeout
+        timeout: 5000, // 5 second timeout
+        headers: {
+          'ngrok-skip-browser-warning': 'true'
+        }
       });
       return response.data;
     } catch (error) {
@@ -99,8 +105,11 @@ export const statisticsApi = {
   // Получить статистику по категориям для пользователя
   getCategoryStatistics: async (userId) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/statistics/categories/user/${userId}`, {
-        timeout: 5000 // 5 second timeout
+      const response = await axios.get(`${API_BASE_URL}/statistics/categories/user/5a27be9d-beef-4112-9466-277312593d62`, {
+        timeout: 5000, // 5 second timeout
+        headers: {
+          'ngrok-skip-browser-warning': 'true'
+        }
       });
       return response.data;
     } catch (error) {

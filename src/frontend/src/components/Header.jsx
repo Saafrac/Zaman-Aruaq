@@ -5,7 +5,7 @@ const Header = () => {
     <header className="header">
       <div className="header-content">
         <div className="logo">
-          <MdMessage size={32} color="#2D9A86" />
+          <MdMessage size={24} color="#2D9A86" />
           <h1>Zaman Bank AI Assistant</h1>
         </div>
         <div className="header-subtitle">
