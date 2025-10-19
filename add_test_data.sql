@@ -1,4 +1,4 @@
--- Add test transactions for user 00000000-0000-0000-0000-000000000001
+    -- Add test transactions for user 00000000-0000-0000-0000-000000000001
 INSERT INTO transactions (id, user_id, amount, description, date, type, category, created_at, updated_at) VALUES
 (UUID(), '00000000-0000-0000-0000-000000000001', 50000.00, 'Зарплата', '2025-10-01', 'INCOME', 'SALARY', NOW(), NOW()),
 (UUID(), '00000000-0000-0000-0000-000000000001', 15000.00, 'Дополнительный доход', '2025-10-05', 'INCOME', 'BUSINESS_INCOME', NOW(), NOW()),
