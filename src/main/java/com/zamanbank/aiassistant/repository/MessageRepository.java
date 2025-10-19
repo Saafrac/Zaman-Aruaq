@@ -24,3 +24,4 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT COUNT(m) FROM Message m WHERE m.conversation = :conversation AND m.role = 'USER'")
     Long countUserMessagesByConversation(@Param("conversation") Conversation conversation);
 }
+

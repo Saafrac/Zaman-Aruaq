@@ -14,3 +14,4 @@ public interface ConversationService {
     Message saveMessage(Message message);
     void closeConversation(Long conversationId, User user);
 }
+

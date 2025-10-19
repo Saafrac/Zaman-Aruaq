@@ -6,3 +6,4 @@ public enum GoalPriority {
     HIGH,
     URGENT
 }
+

@@ -6,3 +6,4 @@ public enum ConversationStatus {
     COMPLETED,          // Завершена
     ABANDONED           // Прервана
 }
+

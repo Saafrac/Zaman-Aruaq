@@ -23,3 +23,4 @@ public enum TransactionCategory {
     HOME_MAINTENANCE,   // Ремонт дома
     OTHER_EXPENSE       // Прочие расходы
 }
+

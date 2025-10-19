@@ -16,3 +16,4 @@ public interface FinancialGoalService {
     FinancialGoal contributeToGoal(Long goalId, BigDecimal amount, User user);
     void deleteGoal(Long goalId, User user);
 }
+

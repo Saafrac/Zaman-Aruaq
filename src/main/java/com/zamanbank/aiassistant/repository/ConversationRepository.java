@@ -26,3 +26,4 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
     @Query("SELECT c FROM Conversation c WHERE c.user = :user AND c.status = 'ACTIVE' ORDER BY c.lastActivityAt DESC LIMIT 1")
     Optional<Conversation> findLatestActiveConversationByUser(@Param("user") User user);
 }
+
